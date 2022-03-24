@@ -292,5 +292,43 @@ func (mq *RabbitMQ) ListenReceiver(receiver Receiver, routineNum int) {
 			}
 		}
 	}
+}
 
+func retry_msg(msg []byte, retry_nums int32, queueExchange QueueExchange) {
+
+}
+
+func Send(queueExchange QueueExchange, msg string) {
+	mq := NewMq(queueExchange)
+	mq.MqConnect()
+
+	defer func() {
+		mq.CloseMqConnect()
+	}()
+
+	mq.sendMsg(msg)
+}
+
+func Recv(queueExchange QueueExchange, reciever Receiver, runNums int) {
+	mq := NewMq(queueExchange)
+	mq.MqConnect()
+
+	defer func() {
+		mq.CloseMqConnect()
+	}()
+
+	forever := make(chan bool)
+	for i := 1; i < runNums; i++ {
+		go func(routineNum int) {
+			defer mq.CloseMqChannel()
+
+			mq.MqOpenChannel()
+			mq.ListenReceiver(reciever, routineNum)
+		}(i)
+	}
+	<-forever
+}
+
+type retryPro struct {
+	msgContent string
 }
