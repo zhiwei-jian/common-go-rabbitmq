@@ -73,7 +73,7 @@ func (r *RabbitMQ) MqOpenChannel() (err error) {
 }
 
 func (r *RabbitMQ) CloseMqChannel() (err error) {
-	r.Channel.Close
+	r.Channel.Close()
 	if err != nil {
 		fmt.Printf("Failed to close MQ channel: %s \n", err)
 	}
